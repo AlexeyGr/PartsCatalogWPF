@@ -48,6 +48,7 @@ namespace PartsCatalog.ViewModel
 			}
 		}
 
+		//TODO: may to be generic
 		public MainViewModel(IDialogService dialogService, PartsContext partsContext)
 		{
 			this.dialogService = dialogService ?? throw new NullReferenceException(nameof(dialogService));
@@ -82,11 +83,11 @@ namespace PartsCatalog.ViewModel
 		private void Add()
 		{
 			var vm = new AddEntityViewModel<Part, PartsMapping>(partsContext);
-			dialogService.ShowDialog(this, vm);
-			Parts = new ObservableCollection<IHierarchicalEntityAdapter<Part, PartsMapping>>(partsContext.Parts
-				.Where(p => p.ParentsMappings.Count == 0)
-				.AsEnumerable()
-				.Select(p => new EntityAdapter<Part, PartsMapping>(p)));
+			if (dialogService.ShowDialog(this, vm) ?? false)
+				Parts = new ObservableCollection<IHierarchicalEntityAdapter<Part, PartsMapping>>(partsContext.Parts
+					.Where(p => p.ParentsMappings.Count == 0)
+					.AsEnumerable()
+					.Select(p => new EntityAdapter<Part, PartsMapping>(p)));
 		}
 
 		private void AddChild()
@@ -127,7 +128,7 @@ namespace PartsCatalog.ViewModel
 		{
 			var data = partsContext.Database.SqlQuery<ReportEntity>
 				($"EXEC PartCompositionSummary {SelectedPart.Entity.Id}")
-				.Select(e => new string[] { e.Name, e.Count.ToString() })
+				.Select(e => new string[] { e.Name, $"{e.Count.ToString()} шт" })
 				.ToArray();
 			IReport report = new OpenXmlWordReport();
 
@@ -148,10 +149,12 @@ namespace PartsCatalog.ViewModel
 			}
 		}
 			   
+		//TODO: should to be moved to repo?
 		private void RemovePart(Part parent, Part part)
 		{
 			if (parent != null)
 			{
+				// find and remove relation if found
 				var targetMapping = partsContext.PartsRelations.Find(parent.Id, part.Id);
 				if (targetMapping != null)
 				{
@@ -170,6 +173,7 @@ namespace PartsCatalog.ViewModel
 				}
 			}
 
+			//find and remove mappings in children
 			if (part.ChildrenMappings.Count > 0)
 			{
 				PartsMapping[] childrenMappings = new PartsMapping[part.ChildrenMappings.Count];
@@ -179,6 +183,8 @@ namespace PartsCatalog.ViewModel
 					RemovePart(part, child.Child);
 				}
 			}
+
+			//if there is no relations in part remove part
 			if (part.ParentsMappings.Count == 0)
 			{
 				try
@@ -198,6 +204,7 @@ namespace PartsCatalog.ViewModel
 		private void UpdateTree(ICollection<IHierarchicalEntityAdapter<Part, PartsMapping>> partProxies,
 			IHierarchicalEntityAdapter<Part, PartsMapping> parentPart)
 		{
+			// if entity added to root collection, then refresh root
 			if (parentPart == null)
 			{
 				Parts = new ObservableCollection<IHierarchicalEntityAdapter<Part, PartsMapping>>(partsContext.Parts
@@ -206,7 +213,7 @@ namespace PartsCatalog.ViewModel
 					.Select(p => new EntityAdapter<Part, PartsMapping>(p)));
 				return;
 			}
-			else
+			else //else looking tree for adapters containing added entity and then update it
 			{
 				parentPart.UpdateChildren();
 				foreach (var partProxy in partProxies)

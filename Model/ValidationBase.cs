@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace PartsCatalog.Model
 {
-	public class ValidationBase : NotifyPropertyChangedBase, INotifyDataErrorInfo, IModelValidator
+	public abstract class ValidationBase : NotifyPropertyChangedBase, INotifyDataErrorInfo, IModelValidator
 	{
 		#region Validation
 
@@ -36,10 +36,8 @@ namespace PartsCatalog.Model
 				return errors.SelectMany(err => err.Value.ToList());
 		}
 
-		public void OnErrorsChanged(string prop)
-		{
+		public void OnErrorsChanged(string prop) =>
 			ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(prop));
-		}
 
 		public void ValidateProperty(object value, [CallerMemberName] string prop = "")
 		{

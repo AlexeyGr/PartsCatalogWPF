@@ -62,10 +62,12 @@ namespace PartsCatalog.ViewModel
 
 			var existingPart = matchedParts.FirstOrDefault();
 
+			//if part already exist in db add reference to it
 			if (existingPart != null)
 			{
 				if (EntitiesMapping != null)
 				{
+					//check for existing relation. show error if exist
 					var existingMappings = from mappings in context.Set<TMapping>()
 										   where mappings.Child.Name
 										   .Equals(NewEntity.Name, StringComparison.OrdinalIgnoreCase)
@@ -85,7 +87,7 @@ namespace PartsCatalog.ViewModel
 					EntitiesMapping.Child = existingPart;
 					parent.Entity.ChildrenMappings.Add(EntitiesMapping);
 				}
-				else
+				else //message if entity exist in root
 				{
 					MessageBox.Show("Запись с таким именем уже существует",
 						"Ошибка",

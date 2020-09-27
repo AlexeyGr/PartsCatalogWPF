@@ -64,6 +64,7 @@ namespace PartsCatalog.Model.Db
 			return base.ValidateEntity(entityEntry, items);
 		}
 
+		// if there is a loop when item added we will return to it (startingPart)
 		private bool CheckLoop(Part part, Part startingPart)
 		{
 			if (part.ChildrenMappings.Count == 0)

@@ -20,7 +20,7 @@ namespace PartsCatalog.Model.Db
 
 		public virtual Part Parent { get; set; }
 
-		[Range(1, int.MaxValue)]
+		[Range(1, int.MaxValue, ErrorMessage = "Количество не менее {1} и не более {2}")]
 		[RegularExpression("([0-9]+)")]
 		public int Count
 		{

@@ -19,7 +19,7 @@ namespace PartsCatalog.Model.Db
 					WITH query AS (
 						SELECT PartsMappings.ChildId, PartsMappings.ParentId, Parts.Name, PartsMappings.[Count]
 						FROM PartsMappings
-						JOIN [dbo].[Parts]
+						JOIN Parts
 						ON ChildId = Id
 						WHERE PartsMappings.ParentId = @id
 	

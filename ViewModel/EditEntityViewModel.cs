@@ -22,11 +22,11 @@ namespace PartsCatalog.ViewModel
 
 		private readonly PartsContext context;
 
-		public TEntity Part { get; private set; }
+		public TEntity Entity { get; private set; }
 
-		public EditEntityViewModel(PartsContext context, TEntity part)
+		public EditEntityViewModel(PartsContext context, TEntity entity)
 		{
-			Part = part ?? throw new NullReferenceException(nameof(part));
+			Entity = entity ?? throw new NullReferenceException(nameof(entity));
 			this.context = context ?? throw new NullReferenceException(nameof(context));
 		}
 
@@ -38,8 +38,9 @@ namespace PartsCatalog.ViewModel
 
 		private void Ok()
 		{
-			var matchedParts = from parts in context.Parts
-							   where parts.Name.Equals(Part.Name, StringComparison.OrdinalIgnoreCase)
+			//TODO: should to be moved to repo?
+			var matchedParts = from parts in context.Set<TEntity>()
+							   where parts.Name.Equals(Entity.Name, StringComparison.OrdinalIgnoreCase)
 							   select parts;
 			var existingPart = matchedParts.FirstOrDefault();
 
@@ -73,6 +74,6 @@ namespace PartsCatalog.ViewModel
 		}
 			
 		private bool OkCmdCanExecute() =>
-			Part != null && !Part.HasErrors;
+			Entity != null && !Entity.HasErrors;
 	}
 }

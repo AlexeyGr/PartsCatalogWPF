@@ -16,6 +16,8 @@ namespace PartsCatalog
 	/// <summary>
 	/// Логика взаимодействия для App.xaml
 	/// </summary>
+	//TODO: should be implemented low cohecive on database context using generic repository
+	//maybe i should add cross-referenced base classes for db entities?
 	public partial class App : Application
 	{
 		private PartsContext partsContext;
