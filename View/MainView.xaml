@@ -1,0 +1,80 @@
+﻿<Window x:Class="PartsCatalog.View.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PartsCatalog"
+		xmlns:vm="clr-namespace:PartsCatalog.ViewModel"
+		xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
+		xmlns:ap="clr-namespace:PartsCatalog.View.AttachedProperties"
+        mc:Ignorable="d"
+        Title="Каталог запчастей" Height="450" Width="800"
+		md:DialogServiceViews.IsRegistered="True">
+	<Window.InputBindings>
+		<KeyBinding Key="F2" Command="{Binding EditCmd}"/>
+		<KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding AddCmd}"/>
+		<KeyBinding Key="N" Modifiers="Ctrl+Shift" Command="{Binding AddChildCmd}"/>
+		<KeyBinding Key="Delete" Command="{Binding RemoveCmd}"/>
+	</Window.InputBindings>
+    <Grid>
+		<TreeView ItemsSource="{Binding Parts}" 
+				  ap:BindableSelectedItemTreeView.Attach="True" 
+				  ap:BindableSelectedItemTreeView.SelectedItem="{Binding SelectedPart, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}">
+			<TreeView.Resources>
+				<ContextMenu x:Key="ItemContextMenu">
+					<MenuItem Header="Новый компонент">
+						<MenuItem Header="Компонент верхнего уровня" 
+							  Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, 
+						Path=DataContext.AddCmd}"/>
+						<MenuItem Header="Вложенный компонент" 
+							  Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, 
+						Path=DataContext.AddChildCmd}"/>
+					</MenuItem>
+					<MenuItem Header="Переименовать" 
+							  Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, 
+						Path=DataContext.EditCmd}"/>
+					<MenuItem Header="Удалить" 
+							  Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, 
+						Path=DataContext.RemoveCmd}"/>
+					<Separator/>
+					<MenuItem Header="Отчет о сводном составе" 
+							  Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, 
+						Path=DataContext.CreateReportCmd}"/>
+				</ContextMenu>
+			</TreeView.Resources>
+			<TreeView.ContextMenu>
+				<ContextMenu>
+					<MenuItem Header="Новый компонент верхнего уровня" Command="{Binding AddCmd}"/>
+				</ContextMenu>
+			</TreeView.ContextMenu>
+			<TreeView.ItemContainerStyle>
+				<Style TargetType="TreeViewItem">
+					<Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}"/>
+				</Style>
+			</TreeView.ItemContainerStyle>
+			<TreeView.ItemTemplate>
+				<HierarchicalDataTemplate ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+					<TextBlock>
+						<TextBlock.Style>
+							<Style TargetType="TextBlock">
+								<Setter Property="Text">
+									<Setter.Value>
+										<MultiBinding StringFormat="{}{0} ({1} шт.)">
+											<Binding Path="Entity.Name" />
+											<Binding Path="Count" />
+										</MultiBinding>
+									</Setter.Value>
+								</Setter>
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding Count}" Value="0">
+										<Setter Property="Text" Value="{Binding Entity.Name}"/>
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</TextBlock.Style>
+					</TextBlock>
+				</HierarchicalDataTemplate>
+			</TreeView.ItemTemplate>
+		</TreeView>
+    </Grid>
+</Window>

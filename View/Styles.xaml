@@ -1,0 +1,19 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:PartsCatalog.View">
+	<ControlTemplate x:Key="errorTemplate">
+		<Grid ToolTip="{Binding ErrorContent}">
+			<Image 
+					   Source="/Resources/error-icon.png" 
+					   Height="24"
+					   HorizontalAlignment="Right">
+				<Image.ToolTip>
+					<TextBlock Text="{Binding ErrorContent}" Foreground="Red"/>
+				</Image.ToolTip>
+			</Image>
+			<Border BorderBrush="Red" BorderThickness="1" >
+				<AdornedElementPlaceholder x:Name="controlWithError"/>
+			</Border>
+		</Grid>
+	</ControlTemplate>
+</ResourceDictionary>
